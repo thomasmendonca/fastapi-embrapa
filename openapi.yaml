@@ -1,0 +1,220 @@
+openapi: 3.0.3
+info:
+  title: API EMBRAPA - Autenticação
+  description: Endpoints para gerenciamento de autenticação e usuários
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Servidor local
+
+paths:
+  # CREATE TOKEN
+  /createToken:
+    post:
+      tags: ["Autenticação"]
+      summary: Gera tokens de acesso e refresh
+      description: Autentica usuário e retorna tokens JWT
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "usuario_exemplo"
+                password:
+                  type: string
+                  example: "senha_secreta"
+              required: ["username", "password"]
+      responses:
+        200:
+          description: Tokens gerados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        401:
+          description: Credenciais inválidas
+
+  # REFRESH TOKEN
+  /refreshToken:
+    post:
+      tags: ["Autenticação"]
+      summary: Renova access token
+      description: Usa refresh token para gerar novo access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              required: ["refresh_token"]
+      responses:
+        200:
+          description: Novo access token gerado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        401:
+          description: Refresh token inválido ou expirado
+
+  # CREATE USER
+  /createUser:
+    post:
+      tags: ["Usuários"]
+      summary: Cria novo usuário
+      description: Registra um novo usuário no sistema
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        201:
+          description: Usuário criado com sucesso
+        400:
+          description: Usuário já existe
+        500:
+          description: Erro interno no servidor
+  
+  # DELETE TOKEN
+  /user/{user_id}:
+    delete:
+      tags: ["Usuários"]
+      summary: Remove usuário
+      description: Deleta um usuário existente (requer autenticação)
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Usuário removido com sucesso
+        401:
+          description: Não autorizado
+        404:
+          description: Usuário não encontrado
+
+
+  # GET PRODUCAO
+  /producao:
+    get:
+      tags: ["Produção"]
+      summary: Retorna dados de produção agrícola
+      description: Requer autenticação e retorna dados em cache por 5 minutos
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  
+  # GET PRODUCAO POR ID
+  /producao/{year}:
+    get:
+      tags:
+        - "Produção"
+      summary: "Obtém dados de produção por ano específico"
+      description: "Retorna uma lista de registros de produção agrícola filtrados pelo ano solicitado"
+      parameters:
+        - name: year
+          in: path
+          description: "Ano para filtrar os dados (ex: 2000)"
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 1970
+            maximum: 2023
+            example: 2000
+      responses:
+        '200':
+          description: "Dados de produção encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: "ID do registro"
+                      example: 1
+                    control:
+                      type: string
+                      description: "Categoria de controle"
+                      example: "VINHO DE MESA"
+                    produto:
+                      type: string
+                      description: "Nome do produto agrícola"
+                      example: "VINHO DE MESA"
+                    producao:
+                      type: integer
+                      description: "Quantidade produzida no ano"
+                      example: 273025576
+        '400':
+          description: "Ano inválido ou não encontrado"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Ano 3000 não encontrado. Anos disponíveis: 1970, 1971, 2000"
+        '401':
+          description: "Não autorizado"
+        '500':
+          description: "Erro interno no servidor"
+      security:
+        - BearerAuth: []
+
+components:
+  schemas:
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          example: "bearer"
+      required: ["access_token", "token_type"]
+
+    UserCreate:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "novo_usuario"
+        password:
+          type: string
+          example: "senha_forte123"
+      required: ["username", "password"]
+
+securitySchemes:
+  BearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
