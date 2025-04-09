@@ -15,11 +15,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # Cria a engine de conexão com o banco de dados, engine é o ponto central de conexão com o banco
 engine = create_engine(DATABASE_URL)
 
-# Cria uma fábrica de sessões (sessionmaker)
-# Configuração:
-# - autocommit=False: Não commita automaticamente (controle manual)
-# - autoflush=False: Não flushes automáticos (melhor performance)
-# - bind=engine: Vincula à engine criada anteriormente
+# Cria uma fábrica de sessões
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base para os modelos declarativos

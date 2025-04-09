@@ -141,13 +141,11 @@ def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        # Valida refresh token
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
         
-        # Verifica se usuário ainda existe
         query = text("SELECT username FROM usuarios WHERE username = :username")
         user = db.execute(query, {"username": username}).fetchone()
         if user is None:
@@ -162,7 +160,17 @@ def refresh_access_token(refresh_token: str, db: Session = Depends(get_db)):
         data={"sub": username}, expires_delta=access_token_expires
     )
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Gera novo refresh token
+    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)  # Defina isso nas configurações
+    new_refresh_token = create_access_token(  # Ou use uma função create_refresh_token se tiver
+        data={"sub": username}, expires_delta=refresh_token_expires
+    )
+    
+    return {
+        "access_token": access_token,
+        "refresh_token": new_refresh_token,
+        "token_type": "bearer"
+    }
 
 # Função para deletar usuário
 def delete_user(db: Session, id: int):

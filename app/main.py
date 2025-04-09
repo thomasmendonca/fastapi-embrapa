@@ -22,5 +22,5 @@ app = FastAPI(
 
 # Mescla a especificação YAML com as rotas
 app.openapi_schema = load_openapi()
-app.include_router(auth_controller.router, prefix="/api/v1")
+app.include_router(auth_controller.router, prefix="/api/v1/auth")
 app.include_router(producao_controller.router, prefix="/api/v1")

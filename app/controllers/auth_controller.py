@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import timedelta
 
-from models.token_models import Token
-from schemas.user_schema import User
+from models.token_models import Token, RefreshTokenRequest
+from models.user_schema import User
 from services.auth_service import (
     authenticate_user,
     create_access_token,
@@ -61,12 +61,11 @@ async def login_for_access_token(
 # Endpoint para renovação do access token usando refresh token
 @router.post("/refreshToken", response_model=Token)
 async def refresh_token_endpoint(
-    refresh_token: str,  # Refresh token enviado no corpo da requisição
-    db: Session = Depends(get_db),  # Sessão do DB
-    current_user: str = Depends(get_current_user)  # Usuário atual (validação)
+    request: RefreshTokenRequest,  # Recebe o refresh token no corpo da requisição
+    db: Session = Depends(get_db)   # Sessão do DB
 ):
     # Chama o serviço de renovação de token
-    return refresh_access_token(refresh_token, db)
+    return refresh_access_token(request.refresh_token, db)
 
 # Endpoint para criação de novos usuários
 @router.post("/createUser", status_code=status.HTTP_201_CREATED)
@@ -77,7 +76,7 @@ async def create_user_endpoint(
     # Chama o serviço de criação de usuário
     return create_user(db, user.username, user.password)
 
-# Endpoint para deletar usuários (protegido por autenticação)
+# Endpoint para deletar usuários
 @router.delete("/user/{user_id}", status_code=status.HTTP_200_OK)
 async def delete_user_endpoint(
     user_id: int,  # ID do usuário a ser deletado (via path parameter)
