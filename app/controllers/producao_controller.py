@@ -15,7 +15,7 @@ async def get_producao_by_year(
     """
     Retorna dados de produção para um ano específico.
     """
-    return producao_service.get_producao_by_year(year)
+    return producao_service.get_data_by_year(year)
 
 
 # ✅ Endpoint para buscar produção por intervalo de anos
@@ -28,4 +28,4 @@ async def get_producao_range(
     """
     Retorna dados de produção em um intervalo de anos (inclusive).
     """
-    return producao_service.get_producao_range(ano_inicio, ano_fim)
+    return producao_service.get_data_range(ano_inicio, ano_fim)

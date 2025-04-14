@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 # Carrega variáveis do .env
 load_dotenv()
 
-# URL de conexão com o banco MySQL (formato: mysql+pymysql://usuário:senha@host:porta/banco)
+# URL de conexão com o banco MySQL
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Cria a engine de conexão com o banco de dados, engine é o ponto central de conexão com o banco
