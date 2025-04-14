@@ -3,13 +3,17 @@ info:
   title: API EMBRAPA - Autenticação
   description: Endpoints para gerenciamento de autenticação e usuários
   version: 1.0.0
+
 servers:
-  - url: http://localhost:8000/api/v1
+  - url: http://127.0.0.1:8000/api/v1
     description: Servidor local
+
+security:
+  - BearerAuth: []  # Isso força o Swagger UI a mostrar o botão Authorize
 
 paths:
   # CREATE TOKEN
-  /createToken:
+  /auth/createToken:
     post:
       tags: ["Autenticação"]
       summary: Gera tokens de acesso e refresh
@@ -17,7 +21,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
               type: object
               properties:
@@ -39,7 +43,7 @@ paths:
           description: Credenciais inválidas
 
   # REFRESH TOKEN
-  /refreshToken:
+  /auth/refreshToken:
     post:
       tags: ["Autenticação"]
       summary: Renova access token
@@ -66,7 +70,7 @@ paths:
           description: Refresh token inválido ou expirado
 
   # CREATE USER
-  /createUser:
+  /auth/createUser:
     post:
       tags: ["Usuários"]
       summary: Cria novo usuário
@@ -86,7 +90,7 @@ paths:
           description: Erro interno no servidor
   
   # DELETE TOKEN
-  /user/{user_id}:
+  /auth/user/{user_id}:
     delete:
       tags: ["Usuários"]
       summary: Remove usuário
@@ -106,26 +110,7 @@ paths:
         404:
           description: Usuário não encontrado
 
-
-  # GET PRODUCAO
-  /producao:
-    get:
-      tags: ["Produção"]
-      summary: Retorna dados de produção agrícola
-      description: Requer autenticação e retorna dados em cache por 5 minutos
-      security:
-        - BearerAuth: []
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-  
-  # GET PRODUCAO POR ID
+  # GET PRODUCAO POR YEAR
   /producao/{year}:
     get:
       tags:
@@ -153,22 +138,19 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    ano:
                       type: integer
-                      description: "ID do registro"
-                      example: 1
-                    control:
-                      type: string
-                      description: "Categoria de controle"
-                      example: "VINHO DE MESA"
+                      description: "Ano do registro"
+                      example: 2000
                     produto:
                       type: string
                       description: "Nome do produto agrícola"
                       example: "VINHO DE MESA"
-                    producao:
-                      type: integer
+                    valor:
+                      type: number
+                      format: float
                       description: "Quantidade produzida no ano"
-                      example: 273025576
+                      example: 273025576.0
         '400':
           description: "Ano inválido ou não encontrado"
           content:
@@ -178,13 +160,480 @@ paths:
                 properties:
                   detail:
                     type: string
-                    example: "Ano 3000 não encontrado. Anos disponíveis: 1970, 1971, 2000"
+                    example: "Ano 3000 não encontrado. Anos disponíveis: 1970-2023"
         '401':
           description: "Não autorizado"
         '500':
           description: "Erro interno no servidor"
       security:
         - BearerAuth: []
+
+  # GET PRODUCAO POR RANGE DE ANOS
+  /producao/{year_start}/{year_end}:
+    get:
+      tags:
+        - "Produção"
+      summary: "Obtém dados de produção por intervalo de anos"
+      description: "Retorna uma lista de registros de produção agrícola filtrados pelo intervalo de anos solicitado (inclusive)"
+      parameters:
+        - name: year_start
+          in: path
+          description: "Ano inicial do intervalo (1970-2023)"
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 1970
+            maximum: 2023
+            example: 2000
+        - name: year_end
+          in: path
+          description: "Ano final do intervalo (1970-2023)"
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 1970
+            maximum: 2023
+            example: 2005
+      responses:
+        '200':
+          description: "Dados de produção encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ano:
+                      type: integer
+                      description: "Ano do registro"
+                      example: 2000
+                    produto:
+                      type: string
+                      description: "Nome do produto agrícola"
+                      example: "VINHO DE MESA"
+                    valor:
+                      type: number
+                      format: float
+                      description: "Quantidade produzida no ano"
+                      example: 273025576.0
+        '400':
+          description: "Intervalo inválido"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Ano inicial deve ser menor ou igual ao ano final"
+        '401':
+          description: "Não autorizado"
+        '500':
+          description: "Erro interno no servidor"
+      security:
+        - BearerAuth: []
+
+  # PROCESSAMENTO VINIFERAS BY YEAR
+  /processamento/viniferas/{year}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados de processamento de uvas viníferas por ano"
+      description: "Retorna dados de processamento de uvas viníferas para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessamentoItem"
+        400:
+          description: "Ano inválido"
+        500:
+          description: "Erro no servidor"
+
+  # VINIFERAS RANGE
+  /processamento/viniferas/{year_start}/{year_end}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados de processamento de uvas viníferas por intervalo"
+      description: "Retorna dados de processamento de uvas viníferas para um intervalo de anos"
+      parameters:
+        - name: year_start
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2010
+        - name: year_end
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessamentoItem"
+        400:
+          description: "Intervalo inválido"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Ano inicial deve ser menor ou igual ao ano final"
+        500:
+          description: "Erro no servidor"
+
+  # PROCESSAMENTO AMERICANAS BY YEAR
+  /processamento/americanas/{year}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados de processamento de uvas americanas por ano"
+      description: "Retorna dados de processamento de uvas americanas para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessamentoItem"
+        400:
+          description: "Ano inválido"
+        500:
+          description: "Erro no servidor"
+
+  # AMERICANAS RANGE
+  /processamento/americanas/{year_start}/{year_end}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados de processamento de uvas americanas por intervalo"
+      description: "Retorna dados de processamento de uvas americanas para um intervalo de anos"
+      parameters:
+        - name: year_start
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2010
+        - name: year_end
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessamentoItem"
+        400:
+          description: "Intervalo inválido"
+        500:
+          description: "Erro no servidor"
+
+  # PROCESSAMENTO UVAS BY YEAR
+  /processamento/uvas/{year}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados de processamento de uvas de mesa por ano"
+      description: "Retorna dados de processamento de uvas de mesa para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessamentoItem"
+        400:
+          description: "Ano inválido"
+        500:
+          description: "Erro no servidor"
+
+  # UVAS RANGE
+  /processamento/uvas/{year_start}/{year_end}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados de processamento de uvas de mesa por intervalo"
+      description: "Retorna dados de processamento de uvas de mesa para um intervalo de anos"
+      parameters:
+        - name: year_start
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2010
+        - name: year_end
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessamentoItem"
+        400:
+          description: "Intervalo inválido"
+        500:
+          description: "Erro no servidor"
+
+  # Sem classificação por ano
+  /processamento/semClass/{year}:
+  get:
+    tags: ["Processamento"]
+    summary: "Dados sem classificação por ano específico"
+    description: "Retorna dados sem classificação específica para um ano determinado"
+    parameters:
+      - name: year
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1970
+          maximum: 2023
+          example: 2020
+    security:
+      - BearerAuth: []
+    responses:
+      200:
+        description: "Dados encontrados"
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SemClassItem"
+      400:
+        description: "Ano inválido"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                detail:
+                  type: string
+                  example: "Ano 3000 não encontrado. Anos disponíveis: 1970-2023"
+      401:
+        description: "Não autorizado"
+      500:
+        description: "Erro interno no servidor"
+
+  # Sem classificação range
+  /processamento/semClass/{year_start}/{year_end}:
+    get:
+      tags: ["Processamento"]
+      summary: "Dados sem classificação por intervalo de anos"
+      description: "Retorna dados sem classificação específica para um intervalo de anos (inclusive)"
+      parameters:
+        - name: year_start
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2010
+        - name: year_end
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SemClassItem"
+        400:
+          description: "Intervalo inválido"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Ano inicial deve ser menor ou igual ao ano final"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro interno no servidor"
+  
+  # GET COMERCIALIZAÇÃO POR ANO
+  /comercializacao/{year}:
+    get:
+      tags: ["Comercialização"]
+      summary: "Dados de comercialização por ano específico"
+      description: "Retorna dados de comercialização para um ano determinado"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComercializacaoItem"
+        400:
+          description: "Ano inválido"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Ano 3000 não encontrado. Anos disponíveis: 1970-2023"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro interno no servidor"
+
+  # GET COMERCIALIZAÇÃO POR INTERVALO DE ANOS
+  /comercializacao/{year_start}/{year_end}:
+    get:
+      tags: ["Comercialização"]
+      summary: "Dados de comercialização por intervalo de anos"
+      description: "Retorna dados de comercialização para um intervalo de anos (inclusive)"
+      parameters:
+        - name: year_start
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2010
+        - name: year_end
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2023
+            example: 2020
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComercializacaoItem"
+        400:
+          description: "Intervalo inválido"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Ano inicial deve ser menor ou igual ao ano final"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro interno no servidor"
+
 
 components:
   schemas:
@@ -213,8 +662,8 @@ components:
           example: "senha_forte123"
       required: ["username", "password"]
 
-securitySchemes:
-  BearerAuth:
-    type: http
-    scheme: bearer
-    bearerFormat: JWT
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
