@@ -1,13 +1,18 @@
 from fastapi import FastAPI, APIRouter
 from pathlib import Path
 import yaml
-from controllers import auth_controller, producao_controller, processamento_controller
+from controllers import (
+    auth_controller, 
+    producao_controller, 
+    processamento_controller,
+    comercializacao_controller
+) 
 
 # Carrega o YAML
 def load_openapi():
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
-    # DATA_DIR = BASE_DIR / "fastapi-embrapa"
-    DATA_DIR = BASE_DIR / "API Tech Challenge"
+    DATA_DIR = BASE_DIR / "fastapi-embrapa"
+    # DATA_DIR = BASE_DIR / "API Tech Challenge"
 
     with open(DATA_DIR / "openapi.yaml", encoding='utf-8') as f:
         return yaml.safe_load(f)
@@ -32,6 +37,7 @@ app.openapi_schema = load_openapi()
 main_router.include_router(auth_controller.router, prefix="/auth")
 main_router.include_router(producao_controller.router)
 main_router.include_router(processamento_controller.router)
+main_router.include_router(comercializacao_controller.router)
 
 # Incluir o roteador principal no app
 app.include_router(main_router)

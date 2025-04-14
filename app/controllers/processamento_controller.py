@@ -5,7 +5,8 @@ from services.auth_service import get_current_user
 from services.processamento_service import (
     processamento_service_viniferas, 
     processamento_service_americanas, 
-    processamento_service_uvas
+    processamento_service_uvas,
+    processamento_service_sem_classificacao
     )
 
 router = APIRouter(prefix="/processamento", tags=["Processamento"])
@@ -84,3 +85,27 @@ async def get_processamento_range(
     """
     return processamento_service_uvas.get_data_range(ano_inicio, ano_fim)
 
+
+# Endpoint para buscar sem classificação
+@router.get("/semClass/{year}", response_model=List[Dict[str, Union[str, int, float]]], status_code=status.HTTP_200_OK)
+async def get_processamento_by_year(
+    year: int,
+    current_user: str = Depends(get_current_user)
+):
+    """
+    Retorna dados de processamento para um ano específico.
+    """
+    return processamento_service_sem_classificacao.get_data_by_year(year)
+
+
+# Endpoint para buscar sem classificação
+@router.get("/semClass", response_model=List[Dict[str, Union[str, int, float]]], status_code=status.HTTP_200_OK)
+async def get_processamento_range(
+    ano_inicio: int = Query(..., ge=1970, le=2025, description="Ano inicial do intervalo"),
+    ano_fim: int = Query(..., ge=1970, le=2025, description="Ano final do intervalo"),
+    current_user: str = Depends(get_current_user)
+):
+    """
+    Retorna dados de processamento em um intervalo de anos (inclusive).
+    """
+    return processamento_service_sem_classificacao.get_data_range(ano_inicio, ano_fim)
