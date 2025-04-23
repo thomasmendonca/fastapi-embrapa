@@ -12,7 +12,9 @@ from services.auth_service import (
     refresh_access_token,
     get_current_user,
     delete_user,
-    REFRESH_TOKEN_EXPIRE_DAYS
+    REFRESH_TOKEN_EXPIRE_DAYS,
+    ACCESS_TOKEN_EXPIRE_MINUTES
+    
 )
 from database import get_db
 from sqlalchemy.orm import Session
@@ -40,7 +42,7 @@ async def login_for_access_token(
         )
     
     # Cria access token com tempo de expiração (em minutos)
-    access_token_expires = timedelta(minutes=REFRESH_TOKEN_EXPIRE_DAYS)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
