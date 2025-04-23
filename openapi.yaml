@@ -633,7 +633,725 @@ paths:
           description: "Não autorizado"
         500:
           description: "Erro interno no servidor"
+  /importacao/vinhosMesa/{year}:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de vinhos de mesa por ano"
+      description: "Retorna dados de importação de vinhos de mesa para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
 
+  /importacao/vinhosMesa:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de vinhos de mesa por intervalo"
+      description: "Retorna dados de importação de vinhos de mesa para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/espumantes/{year}:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de espumantes por ano"
+      description: "Retorna dados de importação de espumantes para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/espumantes:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de espumantes por intervalo"
+      description: "Retorna dados de importação de espumantes para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/uvasFrescas/{year}:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de uvas frescas por ano"
+      description: "Retorna dados de importação de uvas frescas para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/uvasFrescas:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de uvas frescas por intervalo"
+      description: "Retorna dados de importação de uvas frescas para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/uvasPassas/{year}:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de uvas passas por ano"
+      description: "Retorna dados de importação de uvas passas para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/uvasPassas:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de uvas passas por intervalo"
+      description: "Retorna dados de importação de uvas passas para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/sucoUva/{year}:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de suco de uva por ano"
+      description: "Retorna dados de importação de suco de uva para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /importacao/sucoUva:
+    get:
+      tags: ["Importacao"]
+      summary: "Dados de importação de suco de uva por intervalo"
+      description: "Retorna dados de importação de suco de uva para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/vinhosMesa/{year}:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de vinhos de mesa por ano"
+      description: "Retorna dados de exportação de vinhos de mesa para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/vinhosMesa:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de vinhos de mesa por intervalo"
+      description: "Retorna dados de exportação de vinhos de mesa para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/espumantes/{year}:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de espumantes por ano"
+      description: "Retorna dados de exportação de espumantes para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/espumantes:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de espumantes por intervalo"
+      description: "Retorna dados de exportação de espumantes para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/uvasFrescas/{year}:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de uvas frescas por ano"
+      description: "Retorna dados de exportação de uvas frescas para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/uvasFrescas:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de uvas frescas por intervalo"
+      description: "Retorna dados de exportação de uvas frescas para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/sucoUva/{year}:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de suco de uva por ano"
+      description: "Retorna dados de exportação de suco de uva para um ano específico"
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
+
+  /exportacao/sucoUva:
+    get:
+      tags: ["Exportacao"]
+      summary: "Dados de exportação de suco de uva por intervalo"
+      description: "Retorna dados de exportação de suco de uva para um intervalo de anos"
+      parameters:
+        - name: ano_inicio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2010
+        - name: ano_fim
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1970
+            maximum: 2025
+            example: 2020
+      responses:
+        200:
+          description: "Dados encontrados"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    oneOf:
+                      - type: string
+                      - type: integer
+                      - type: number
+        400:
+          description: "Intervalo inválido"
+        401:
+          description: "Não autorizado"
+        500:
+          description: "Erro no servidor"
+      security:
+        - BearerAuth: []
 
 components:
   schemas:
