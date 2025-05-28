@@ -52,6 +52,7 @@ graph TD
     E --> F[Resposta em JSON/CSV]
     F --> G[Retorno ao Cliente]
     C -->|Inválido| X[Erro 401 - Não autorizado]
+```
 
 
 # 🍇 API Vitivinicultura Embrapa - Tech Challenge FIAP
@@ -211,7 +212,13 @@ Não se esqueça de gerar e usar o token JWT antes de acessar os dados.
 
 ## 🧑‍💻 Desenvolvido por
 
-Thomas Nícolas e equipe - FIAP Tech Challenge 2025  
+- `Alexandre Cabanas - RM362932`
+- `Gabriel Fernandes - RM362747`
+- `Kauê Braz - RM362598`
+- `Kaue Santana - RM363168`
+- `Thomas Nícolas - RM362762`
+  
+- FIAP Tech Challenge 2025  
 Projeto acadêmico, sem fins lucrativos.
 
 ---
